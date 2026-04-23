@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>콩콩 수학 놀이터</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="game">
+      <h1>콩콩 수학 놀이터</h1>
+      <p class="subtitle">유아를 위한 수 개념 놀이 (몇 개 / 몇 마리 / 누가 더 많을까)</p>
+
+      <section class="toolbar card">
+        <div class="field">
+          <label for="levelSelect">난이도</label>
+          <select id="levelSelect">
+            <option value="easy">쉬움 (1~5)</option>
+            <option value="normal" selected>보통 (1~9)</option>
+            <option value="hard">어려움 (1~12)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="modeSelect">문제 유형</label>
+          <select id="modeSelect">
+            <option value="count" selected>개수 세기</option>
+            <option value="compare">더 많은 쪽 고르기</option>
+          </select>
+        </div>
+
+        <button id="newGameBtn" type="button">처음부터</button>
+      </section>
+
+      <section class="card">
+        <h2 id="question">문제 불러오는 중...</h2>
+        <div id="items" class="items" aria-live="polite"></div>
+
+        <div class="choices" id="choices"></div>
+        <p id="feedback" class="feedback" aria-live="assertive"></p>
+
+        <div class="actions">
+          <button id="nextBtn" type="button">다음 문제</button>
+        </div>
+      </section>
+
+      <section class="progress">
+        <p>맞힌 문제: <strong id="score">0</strong></p>
+        <p>푼 문제: <strong id="round">0</strong></p>
+        <p>연속 정답: <strong id="streak">0</strong></p>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

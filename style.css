@@ -1,0 +1,161 @@
+:root {
+  --bg: #fff8e7;
+  --card: #ffffff;
+  --text: #3a2e2a;
+  --accent: #ff8b6a;
+  --accent-dark: #f06a46;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Noto Sans KR", system-ui, sans-serif;
+  background: linear-gradient(180deg, var(--bg), #ffe2cc);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.game {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.toolbar {
+  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+select,
+#newGameBtn {
+  border: 1px solid #ffd6c2;
+  background: #fff8f3;
+  border-radius: 10px;
+  min-height: 42px;
+  padding: 8px 10px;
+  font-size: 1rem;
+}
+
+#newGameBtn {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.items {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  line-height: 1.5;
+  text-align: center;
+  min-height: 72px;
+  margin: 16px 0;
+  word-break: break-word;
+  white-space: pre-line;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.choice-btn,
+#nextBtn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.choice-btn {
+  background: #ffefe3;
+}
+
+.choice-btn:hover {
+  background: #ffd6c2;
+}
+
+.choice-btn:disabled {
+  opacity: 0.85;
+  cursor: not-allowed;
+}
+
+.choice-btn.correct {
+  background: #a8f0b6;
+}
+
+.choice-btn.wrong {
+  background: #ffc5be;
+}
+
+.feedback {
+  min-height: 24px;
+  font-size: 1rem;
+  margin: 12px 0;
+  text-align: center;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+}
+
+#nextBtn {
+  background: var(--accent);
+  color: white;
+}
+
+#nextBtn:hover {
+  background: var(--accent-dark);
+}
+
+.progress {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+}
+
+@media (max-width: 600px) {
+  .toolbar,
+  .choices {
+    grid-template-columns: 1fr;
+  }
+}
