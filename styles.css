@@ -27,7 +27,8 @@ body {
 .top-bar,
 .selected-panel,
 .actions,
-.upgrades {
+.upgrades,
+.toast-card {
   background: var(--card);
   border-radius: 12px;
   padding: 10px;
@@ -51,12 +52,13 @@ body {
   gap: 4px;
   align-items: stretch;
   cursor: pointer;
-  transition: transform 0.05s ease, filter 0.2s ease;
+  transition: transform 0.05s ease, filter 0.2s ease, box-shadow 0.12s ease;
 }
 
 .tree-cell:active { transform: scale(0.98); }
 .tree-cell.hot { filter: saturate(1.3); }
 .tree-cell.damaged { filter: grayscale(0.4) brightness(0.8); }
+.tree-cell.selected { box-shadow: inset 0 0 0 2px #388e3c; }
 
 .tree-visual {
   font-size: 30px;
@@ -96,7 +98,8 @@ body {
 
 button.primary,
 #harvestBtn,
-.upgrade-buy {
+.upgrade-buy,
+.small-actions button {
   width: 100%;
   border: none;
   border-radius: 10px;
@@ -107,6 +110,16 @@ button.primary,
 
 button.primary { background: var(--accent); color: white; }
 #harvestBtn { background: #2e7d32; color: white; }
+.small-actions {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.small-actions button {
+  background: #e8f5e9;
+  color: #1b5e20;
+}
 #harvestBtn:disabled,
 .upgrade-buy:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -117,4 +130,10 @@ button.primary { background: var(--accent); color: white; }
   margin-bottom: 8px;
   display: grid;
   gap: 6px;
+}
+
+#toast {
+  font-size: 13px;
+  color: #2e7d32;
+  min-height: 18px;
 }

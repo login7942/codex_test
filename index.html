@@ -23,11 +23,19 @@
 
       <section class="actions">
         <button id="plantBtn" class="primary">묘목 심기</button>
+        <div class="small-actions">
+          <button id="saveBtn">저장</button>
+          <button id="resetBtn">리셋</button>
+        </div>
       </section>
 
       <section class="upgrades">
         <h2>업그레이드</h2>
         <div id="upgradeList"></div>
+      </section>
+
+      <section class="toast-card">
+        <div id="toast">준비 완료</div>
       </section>
     </main>
 
@@ -50,6 +58,6 @@
       </button>
     </template>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
   </body>
 </html>

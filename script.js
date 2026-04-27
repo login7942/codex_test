@@ -1,16 +1,15 @@
-const STATES = ["Empty", "Seedling", "YoungTree", "MatureTree", "GiantTree"];
+import {
+  CONFIG,
+  STATES,
+  canHarvest,
+  createTree,
+  damageChance,
+  expectedReward,
+  shouldAdvanceToGiant,
+  stateIndex,
+} from "./game-core.js";
 
-const CONFIG = {
-  gridSize: 9,
-  tickMs: 100,
-  clickStimulusBase: 12,
-  clickOverchargeBase: 10,
-  heatPerClickBase: 8,
-  heatDecayPerSec: 10,
-  damageThreshold: 100,
-  goldMutationChance: 0.12,
-  baseReward: 20,
-};
+const SAVE_KEY = "growing-tree-clicker-save-v2";
 
 const stateEmoji = {
   Empty: "⬜",
@@ -41,45 +40,71 @@ const upgradeDefs = [
   { key: "lumberjack", name: "견습 목수", baseCost: 80, desc: "낮은 단계 나무 자동 수확", costMult: 2.0 },
 ];
 
-function createTree() {
-  return {
-    state: "Empty",
-    growthProgress: 0,
-    tapStimulus: 0,
-    overcharge: 0,
-    heat: 0,
-    instability: 0,
-    baseReward: CONFIG.baseReward,
-    isMutated: false,
-    mutationType: "Normal",
-    isDamaged: false,
-    damageTimer: 0,
-  };
-}
-
 function init() {
-  game.trees = Array.from({ length: CONFIG.gridSize }, () => createTree());
+  loadGame();
+  if (!game.trees.length) {
+    game.trees = Array.from({ length: CONFIG.gridSize }, () => createTree());
+  }
+
   drawGrid();
   drawUpgrades();
   bindUI();
+  render();
   setInterval(tick, CONFIG.tickMs);
+  setInterval(saveGame, 3000);
 }
 
 function bindUI() {
   document.getElementById("plantBtn").addEventListener("click", plantSeedling);
   document.getElementById("harvestBtn").addEventListener("click", harvestSelected);
+  document.getElementById("saveBtn").addEventListener("click", saveGame);
+  document.getElementById("resetBtn").addEventListener("click", resetGame);
+}
+
+function setToast(text) {
+  document.getElementById("toast").textContent = text;
+}
+
+function saveGame() {
+  localStorage.setItem(SAVE_KEY, JSON.stringify(game));
+  setToast("저장 완료");
+}
+
+function loadGame() {
+  const raw = localStorage.getItem(SAVE_KEY);
+  if (!raw) return;
+  try {
+    const parsed = JSON.parse(raw);
+    Object.assign(game, parsed);
+    if (!Array.isArray(game.trees) || game.trees.length !== CONFIG.gridSize) {
+      game.trees = Array.from({ length: CONFIG.gridSize }, () => createTree());
+    }
+  } catch {
+    game.trees = Array.from({ length: CONFIG.gridSize }, () => createTree());
+  }
+}
+
+function resetGame() {
+  localStorage.removeItem(SAVE_KEY);
+  game.wood = 0;
+  game.selectedIndex = null;
+  game.upgrades = { glove: 0, hammer: 0, sprinkler: 0, heatControl: 0, lumberjack: 0 };
+  game.trees = Array.from({ length: CONFIG.gridSize }, () => createTree());
+  render();
+  setToast("초기화 완료");
 }
 
 function plantSeedling() {
   const idx = game.trees.findIndex((t) => t.state === "Empty");
-  if (idx === -1) return;
+  if (idx === -1) {
+    setToast("빈칸이 없습니다.");
+    return;
+  }
+
   game.trees[idx].state = "Seedling";
   game.trees[idx].growthProgress = 10;
+  setToast(`묘목 심기: 칸 ${idx + 1}`);
   render();
-}
-
-function stateIndex(state) {
-  return STATES.indexOf(state);
 }
 
 function advanceState(tree) {
@@ -113,11 +138,17 @@ function clickTree(index) {
     tree.growthProgress = Math.min(100, tree.growthProgress + clickStimulus * 0.35);
     if (tree.tapStimulus >= 100) {
       advanceState(tree);
+      setToast("성장 폭주! 단계 상승");
     }
   } else {
     tree.overcharge += clickOvercharge;
-    const instabilityFactor = tree.mutationType === "Gold" ? 1.4 : 1;
-    tree.instability += (1 + tree.overcharge / 120) * instabilityFactor;
+    const instabilityFactor = tree.mutationType === "Gold" ? 1.45 : 1;
+    tree.instability = Math.min(100, tree.instability + (1 + tree.overcharge / 120) * instabilityFactor);
+
+    if (shouldAdvanceToGiant(tree)) {
+      tree.state = "GiantTree";
+      setToast("거대나무로 성장!");
+    }
   }
 
   maybeDamage(tree);
@@ -125,41 +156,23 @@ function clickTree(index) {
 }
 
 function maybeDamage(tree) {
-  if (tree.heat < CONFIG.damageThreshold) return;
-  const chance = Math.min(0.35, (tree.heat - 90) / 100);
-  if (Math.random() < chance) {
+  const chance = damageChance(tree);
+  if (chance > 0 && Math.random() < chance) {
     tree.isDamaged = true;
     tree.damageTimer = 4;
+    setToast("나무 손상! 보상 감소");
   }
-}
-
-function growthMultiplier(state) {
-  return ({ Seedling: 0.6, YoungTree: 0.9, MatureTree: 1.2, GiantTree: 1.6 }[state] || 1);
-}
-
-function overchargeMultiplier(overcharge) {
-  return 1 + Math.min(1.5, (overcharge / 100) * 0.8) + Math.max(0, overcharge - 100) * 0.005;
-}
-
-function mutationMultiplier(tree) {
-  return tree.mutationType === "Gold" ? 2.5 : 1;
-}
-
-function damageMultiplier(tree) {
-  return tree.isDamaged ? 0.7 : 1;
-}
-
-function expectedReward(tree) {
-  const reward = tree.baseReward * growthMultiplier(tree.state) * overchargeMultiplier(tree.overcharge) * mutationMultiplier(tree) * damageMultiplier(tree);
-  return Math.floor(reward);
 }
 
 function harvest(index) {
   const tree = game.trees[index];
-  if (stateIndex(tree.state) < stateIndex("MatureTree")) return;
-  game.wood += expectedReward(tree);
+  if (!canHarvest(tree)) return;
+
+  const reward = expectedReward(tree);
+  game.wood += reward;
   game.trees[index] = createTree();
   if (game.selectedIndex === index) game.selectedIndex = null;
+  setToast(`쾅! +${reward} 목재`);
 }
 
 function harvestSelected() {
@@ -187,7 +200,7 @@ function tick() {
     }
 
     if (game.upgrades.lumberjack > 0 && ["Seedling", "YoungTree"].includes(tree.state)) {
-      const autoChance = 0.01 * game.upgrades.lumberjack;
+      const autoChance = 0.003 * game.upgrades.lumberjack;
       if (Math.random() < autoChance) {
         game.wood += Math.floor(tree.baseReward * 0.5);
         game.trees[i] = createTree();
@@ -216,7 +229,7 @@ function buyUpgrade(key) {
 
 function renderTopBar() {
   document.getElementById("woodCount").textContent = Math.floor(game.wood);
-  const autoIncome = (game.upgrades.lumberjack * 1.3 + game.upgrades.sprinkler * 0.6).toFixed(1);
+  const autoIncome = (game.upgrades.lumberjack * 0.8 + game.upgrades.sprinkler * 0.4).toFixed(1);
   document.getElementById("autoIncome").textContent = autoIncome;
 }
 
@@ -252,8 +265,9 @@ function updateGrid() {
 
     cell.classList.toggle("hot", tree.heat >= 80);
     cell.classList.toggle("damaged", tree.isDamaged);
+    cell.classList.toggle("selected", i === game.selectedIndex);
 
-    const rewardPreview = stateIndex(tree.state) >= stateIndex("MatureTree") ? ` | 예상 ${expectedReward(tree)}` : "";
+    const rewardPreview = canHarvest(tree) ? ` | 예상 ${expectedReward(tree)}` : "";
     const damageText = tree.isDamaged ? "손상" : "";
     stateText.textContent = `${tree.state}${tree.mutationType === "Gold" ? "(황금)" : ""} ${damageText}${rewardPreview}`.trim();
   });
@@ -276,10 +290,10 @@ function drawSelected() {
     `과충전: ${tree.overcharge.toFixed(0)}%`,
     `열기: ${tree.heat.toFixed(0)}%`,
     `불안정: ${tree.instability.toFixed(0)}%`,
-    `예상 수확: ${stateIndex(tree.state) >= stateIndex("MatureTree") ? expectedReward(tree) : 0}`,
+    `예상 수확: ${canHarvest(tree) ? expectedReward(tree) : 0}`,
   ].join(" | ");
 
-  harvestBtn.disabled = stateIndex(tree.state) < stateIndex("MatureTree");
+  harvestBtn.disabled = !canHarvest(tree);
 }
 
 function drawUpgrades() {
