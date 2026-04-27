@@ -1,0 +1,139 @@
+:root {
+  --bg: #f5f8ef;
+  --card: #ffffff;
+  --ink: #243024;
+  --accent: #4caf50;
+  --warn: #ff9800;
+  --danger: #ef5350;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: ui-rounded, 'Noto Sans KR', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.app {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.top-bar,
+.selected-panel,
+.actions,
+.upgrades,
+.toast-card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.tree-cell {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: #fdfdfd;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: stretch;
+  cursor: pointer;
+  transition: transform 0.05s ease, filter 0.2s ease, box-shadow 0.12s ease;
+}
+
+.tree-cell:active { transform: scale(0.98); }
+.tree-cell.hot { filter: saturate(1.3); }
+.tree-cell.damaged { filter: grayscale(0.4) brightness(0.8); }
+.tree-cell.selected { box-shadow: inset 0 0 0 2px #388e3c; }
+
+.tree-visual {
+  font-size: 30px;
+  text-align: center;
+}
+
+.gauge-row {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+}
+
+.bar {
+  height: 8px;
+  border-radius: 999px;
+  background: #e8ece8;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  width: 0;
+  transition: width 0.12s linear;
+}
+
+.fill.growth { background: var(--accent); }
+.fill.overcharge { background: #42a5f5; }
+.fill.heat { background: linear-gradient(90deg, #ffeb3b, var(--danger)); }
+
+.state-text {
+  font-size: 11px;
+  text-align: center;
+  min-height: 16px;
+}
+
+button.primary,
+#harvestBtn,
+.upgrade-buy,
+.small-actions button {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button.primary { background: var(--accent); color: white; }
+#harvestBtn { background: #2e7d32; color: white; }
+.small-actions {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.small-actions button {
+  background: #e8f5e9;
+  color: #1b5e20;
+}
+#harvestBtn:disabled,
+.upgrade-buy:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.upgrade-item {
+  border: 1px solid #e3e9e3;
+  border-radius: 10px;
+  padding: 8px;
+  margin-bottom: 8px;
+  display: grid;
+  gap: 6px;
+}
+
+#toast {
+  font-size: 13px;
+  color: #2e7d32;
+  min-height: 18px;
+}

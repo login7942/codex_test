@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>성장하는 나무 클리커</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="top-bar">
+        <div>🌲 목재: <strong id="woodCount">0</strong></div>
+        <div>⚙️ 자동 수익/초: <strong id="autoIncome">0</strong></div>
+      </header>
+
+      <section id="grid" class="grid" aria-label="3x3 나무 그리드"></section>
+
+      <section class="selected-panel">
+        <h2>선택한 나무</h2>
+        <div id="selectedInfo">나무를 선택하세요.</div>
+        <button id="harvestBtn" disabled>수확</button>
+      </section>
+
+      <section class="actions">
+        <button id="plantBtn" class="primary">묘목 심기</button>
+        <div class="small-actions">
+          <button id="saveBtn">저장</button>
+          <button id="resetBtn">리셋</button>
+        </div>
+      </section>
+
+      <section class="upgrades">
+        <h2>업그레이드</h2>
+        <div id="upgradeList"></div>
+      </section>
+
+      <section class="toast-card">
+        <div id="toast">준비 완료</div>
+      </section>
+    </main>
+
+    <template id="cellTemplate">
+      <button class="tree-cell">
+        <div class="tree-visual">⬜</div>
+        <div class="gauge-row">
+          <div class="label">성장</div>
+          <div class="bar"><div class="fill growth"></div></div>
+        </div>
+        <div class="gauge-row">
+          <div class="label">과충전</div>
+          <div class="bar"><div class="fill overcharge"></div></div>
+        </div>
+        <div class="gauge-row">
+          <div class="label">열기</div>
+          <div class="bar"><div class="fill heat"></div></div>
+        </div>
+        <div class="state-text"></div>
+      </button>
+    </template>
+
+    <script type="module" src="script.js"></script>
+  </body>
+</html>
